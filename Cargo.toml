@@ -1,9 +1,9 @@
 [package]
 name = "big_space_solari"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Resets bevy_solari (and optionally DLSS) ray-traced lighting temporal history when a big_space floating origin recenters."
+description = "Resets bevy_solari (and optionally DLSS) ray-traced lighting temporal history when a big_space floating origin recenters; optional scale-bias feature keeps ray-traced geometry artifact-free at large coordinates."
 documentation = "https://docs.rs/big_space_solari"
 repository = "https://github.com/SindSieEcht/big_space_solari"
 readme = "README.md"
@@ -14,9 +14,22 @@ categories = ["game-development", "rendering"]
 big_space = "0.12"
 bevy_app = "0.18"
 bevy_ecs = "0.18"
+# `scale-bias` vendors a byte-for-byte copy of bevy_solari's `scene_bindings`
+# shader (src/raytracing_scene_bindings_override.wgsl); re-sync it when bumping.
 bevy_solari = "0.18"
 bevy_anti_alias = { version = "0.18", optional = true, features = ["dlss"] }
+# `scale-bias` only: runtime shader-asset override of bevy_solari::scene_bindings.
+bevy_asset = { version = "0.18", optional = true }
+bevy_shader = { version = "0.18", optional = true }
+tracing = { version = "0.1", optional = true, default-features = false }
 
 [features]
 default = []
 dlss = ["dep:bevy_anti_alias"]
+# Scale-aware ray bias: fixes bevy_solari's room-scale RAY_T_MIN/RAY_T_MAX at true scale.
+scale-bias = ["dep:bevy_asset", "dep:bevy_shader", "dep:tracing"]
+
+# docs.rs builds with `scale-bias` so SolariRayBias/SolariRayBiasPlugin are
+# documented. NOT all-features: `dlss` needs the NVIDIA DLSS SDK (absent on docs.rs).
+[package.metadata.docs.rs]
+features = ["scale-bias"]

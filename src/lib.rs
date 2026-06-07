@@ -14,6 +14,10 @@
 //! [`SolariLighting::reset`](bevy_solari::prelude::SolariLighting::reset) so the
 //! history restarts cleanly for the one frame it takes to re-converge. Enable the
 //! `dlss` feature to also reset DLSS Ray Reconstruction.
+//!
+//! Enable the `scale-bias` feature for [`SolariRayBiasPlugin`], which additionally
+//! overrides `bevy_solari`'s room-scale ray interval so ray-traced geometry stays
+//! artifact-free at true (large-coordinate) scale.
 
 use std::collections::HashMap;
 
@@ -24,6 +28,11 @@ use big_space::prelude::{BigSpace, BigSpaceSystems, CellCoord};
 
 #[cfg(feature = "dlss")]
 use bevy_anti_alias::dlss::{Dlss, DlssRayReconstructionFeature};
+
+#[cfg(feature = "scale-bias")]
+mod ray_bias;
+#[cfg(feature = "scale-bias")]
+pub use ray_bias::{SolariRayBias, SolariRayBiasPlugin};
 
 /// Resets ray-traced lighting temporal history on each floating-origin recenter.
 pub struct BigSpaceSolariPlugin;
